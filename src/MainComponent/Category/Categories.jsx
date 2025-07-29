@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import CategoryForm from "./CategoryForm.jsx";
 import EditCategory from "./EditCategory";
 import { Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const formatDateString = (dateString) => {
   const date = new Date(dateString);
@@ -17,6 +18,7 @@ const Categories = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   const fetchData = useCallback(() => {
     axios
@@ -84,6 +86,11 @@ const Categories = () => {
       flex: 1,
       align: "left",
       headerClassName: "super-app-theme--header-bold",
+       renderCell: (params) => (
+        <span onClick={() => navigate(`/categories/${params.value}`)}>
+          {params.value}
+        </span>
+      )
     },
     {
       field: "categoryName",

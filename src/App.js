@@ -5,6 +5,8 @@ import TopBar from './TopBar/TopBar';
 import { createContext, useEffect,useMemo,useRef,useState } from 'react';
 import MainComponent from './MainComponent/MainComponent';
 import useCart from './MainComponent/ProductCards/useCart';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './AppRoutes';
 
 function App() {
   // const sidebarRef = useRef([]);
@@ -12,14 +14,16 @@ function App() {
   const { cart, addProduct } = useCart([]);
   const [selectedMenu, setSelectedMenu] = useState("Category");
   return (
-    <>
+    <BrowserRouter>
+      
       <Sidebar  setValue = {setSidebarWidth} selectedMenu = {setSelectedMenu} />
       <TopBar topBarWidth={sidebarWidth} cart={cart}/>
       <MainComponent topBarWidth = {sidebarWidth} 
       addProduct={addProduct}
       menu={selectedMenu}
       />
-      </>
+      <AppRoutes />
+      </BrowserRouter>
   );
 }
 

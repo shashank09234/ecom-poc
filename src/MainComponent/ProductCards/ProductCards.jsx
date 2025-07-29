@@ -1,5 +1,5 @@
 // src/ProductCards.js
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -7,6 +7,9 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Grid from "@mui/material/Grid";
+import axios from "axios";
+import { Stack, TextField } from "@mui/material";
+import ProductForm from "./ProductForm";
 // import useProduct from "../MainComponent/useProduct";
 
 
@@ -18,11 +21,107 @@ import Grid from "@mui/material/Grid";
     // cart.quantity=product.quantity
 //     addProduct(cart);
 // };
-export default function ProductCards({addToCart,products }) {
+const formatDateString = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0];
+};
+export default function ProductCards({addToCart }) {
 // const { product: products, addProduct } = useProduct();
+const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+
+  const fetchData = useCallback(() => {
+    axios
+      .get("http://localhost:8080/inventry/product")
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error("Network response was not ok");
+        }
+        return response.data;
+      })
+      .then((data) => {
+        const formattedData = data.map((item) => ({
+          ...item,
+          date: formatDateString(item.date),
+        }));
+        setProducts(formattedData);
+        setFilteredProducts(formattedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+   useEffect(() => {
+      fetchData(); // Use the memoized callback here
+    }, [fetchData]);
+
+    const handleSearch = (event) => {
+    const { value } = event.target;
+    setSearchQuery(value);
+    if (value.trim() === "") {
+      setFilteredProducts(products); // Display all data when search query is empty
+    } else {
+      console.log(products,"products")
+      console.log(value,"value")
+      const filteredData = products.filter((product) =>
+        
+        Object.values(product).some((val) =>
+         (val !== null && val !== undefined) &&
+  val.toString().toLowerCase().includes(value.toLowerCase())
+        )
+      );
+      setFilteredProducts(filteredData);
+    }
+  };
+
+   const toggleDrawer = (open) => {
+    setIsDrawerOpen(open);
+  };
+
+  const toggleEditDrawer = (open) => {
+    setIsEditDrawerOpen(open);
+  };
+
+  const addProductAndUpdate = async () => {
+    try {
+      console.log("Updating Product list...");
+      await fetchData(); // Fetch updated category list
+    } catch (error) {
+      console.error("Error updating Product list:", error);
+    }
+  };
+
   return (
+    <>
+    <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={{ xs: 1, sm: 2, md: 4 }}
+          sx={{ justifyContent: "flex-end", marginBottom: "10px" }}
+        >
+          <TextField
+            id="standard-basic"
+            label="Search Category"
+            variant="standard"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+
+          <Grid item xs={12} sm={6} md={6}>
+            <ProductForm
+              open={isDrawerOpen}
+              onClose={() => toggleDrawer(false)}
+              anchor="right"
+              onProductAdded={addProductAndUpdate}
+            />
+          </Grid>
+        </Stack>
+        <div style={{ overflowX: "auto" }}>
     <Grid container spacing={3}>
-      {products.map(product => (
+      {filteredProducts.map(product => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <Card sx={{ maxWidth: 345 }}>
             <CardMedia
@@ -33,10 +132,10 @@ export default function ProductCards({addToCart,products }) {
             />
             <CardContent>
               <Typography gutterBottom variant="h6" component="div">
-                {product.name}
+                {product.productName}
               </Typography>
               <Typography variant="subtitle1" color="text.secondary">
-                ${product.price.toFixed(2)}
+                ${product.price ?product.price.toFixed(2):0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Stock: {product.quantity}
@@ -62,5 +161,7 @@ export default function ProductCards({addToCart,products }) {
         </Grid>
       ))}
     </Grid>
+    </div>
+    </>
   );
 }
