@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
@@ -79,18 +84,17 @@ const Categories = () => {
   };
 
   const columns = [
-    // { field: 'id', headerName: 'Id',flex: 1, align: 'left', headerClassName: 'super-app-theme--header-bold'  },
     {
       field: "categoryCode",
       headerName: "Category Code",
       flex: 1,
       align: "left",
       headerClassName: "super-app-theme--header-bold",
-       renderCell: (params) => (
+      renderCell: (params) => (
         <span onClick={() => navigate(`/categories/${params.value}`)}>
           {params.value}
         </span>
-      )
+      ),
     },
     {
       field: "categoryName",
@@ -156,29 +160,29 @@ const Categories = () => {
           </Grid>
         </Stack>
         <div style={{ overflowX: "auto" }}>
-        <DataGrid
-          // sx={{ "& .MuiDataGrid-cell:focus": { outline: "none" },"& .MuiDataGrid-colCellHeader:focus": { outline: "none" }  }}
-          sx={{
-            [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
-              {
-                outline: "none",
-              },
-            [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
-              {
-                outline: "none",
-              },
+          <DataGrid
+            // sx={{ "& .MuiDataGrid-cell:focus": { outline: "none" },"& .MuiDataGrid-colCellHeader:focus": { outline: "none" }  }}
+            sx={{
+              [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
+                {
+                  outline: "none",
+                },
+              [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
+                {
+                  outline: "none",
+                },
               // Adjust this value as needed
-          }}
-          rows={filteredRows}
-          columns={columns}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 5 } },
-          }}
-          pageSizeOptions={[10]}
-          disableRowSelectionOnClick={true}
-          disableColumnSelector={true}
-          autoHeight={true}
-        />
+            }}
+            rows={filteredRows}
+            columns={columns}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 5 } },
+            }}
+            pageSizeOptions={[10]}
+            disableRowSelectionOnClick={true}
+            disableColumnSelector={true}
+            autoHeight={true}
+          />
         </div>
       </div>
     </>

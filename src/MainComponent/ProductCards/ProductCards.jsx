@@ -10,24 +10,14 @@ import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Stack, TextField } from "@mui/material";
 import ProductForm from "./ProductForm";
-// import useProduct from "../MainComponent/useProduct";
 
-
-
-
-// const addToCart = (product)=>{
-    // cart.name=product.name;
-    // cart.price=product.price
-    // cart.quantity=product.quantity
-//     addProduct(cart);
-// };
 const formatDateString = (dateString) => {
   const date = new Date(dateString);
   return date.toISOString().split("T")[0];
 };
-export default function ProductCards({addToCart }) {
-// const { product: products, addProduct } = useProduct();
-const [products, setProducts] = useState([]);
+export default function ProductCards() {
+  // const { product: products, addProduct } = useProduct();
+  const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -55,30 +45,31 @@ const [products, setProducts] = useState([]);
       });
   }, []);
 
-   useEffect(() => {
-      fetchData(); // Use the memoized callback here
-    }, [fetchData]);
+  useEffect(() => {
+    fetchData(); // Use the memoized callback here
+  }, [fetchData]);
 
-    const handleSearch = (event) => {
+  const handleSearch = (event) => {
     const { value } = event.target;
     setSearchQuery(value);
     if (value.trim() === "") {
       setFilteredProducts(products); // Display all data when search query is empty
     } else {
-      console.log(products,"products")
-      console.log(value,"value")
+      console.log(products, "products");
+      console.log(value, "value");
       const filteredData = products.filter((product) =>
-        
-        Object.values(product).some((val) =>
-         (val !== null && val !== undefined) &&
-  val.toString().toLowerCase().includes(value.toLowerCase())
+        Object.values(product).some(
+          (val) =>
+            val !== null &&
+            val !== undefined &&
+            val.toString().toLowerCase().includes(value.toLowerCase())
         )
       );
       setFilteredProducts(filteredData);
     }
   };
 
-   const toggleDrawer = (open) => {
+  const toggleDrawer = (open) => {
     setIsDrawerOpen(open);
   };
 
@@ -97,71 +88,71 @@ const [products, setProducts] = useState([]);
 
   return (
     <>
-    <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={{ xs: 1, sm: 2, md: 4 }}
-          sx={{ justifyContent: "flex-end", marginBottom: "10px" }}
-        >
-          <TextField
-            id="standard-basic"
-            label="Search Category"
-            variant="standard"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 1, sm: 2, md: 4 }}
+        sx={{ justifyContent: "flex-end", marginBottom: "10px" }}
+      >
+        <TextField
+          id="standard-basic"
+          label="Search Category"
+          variant="standard"
+          value={searchQuery}
+          onChange={handleSearch}
+        />
 
-          <Grid item xs={12} sm={6} md={6}>
-            <ProductForm
-              open={isDrawerOpen}
-              onClose={() => toggleDrawer(false)}
-              anchor="right"
-              onProductAdded={addProductAndUpdate}
-            />
-          </Grid>
-        </Stack>
-        <div style={{ overflowX: "auto" }}>
-    <Grid container spacing={3}>
-      {filteredProducts.map(product => (
-        <Grid item xs={12} sm={6} md={4} key={product.id}>
-          <Card sx={{ maxWidth: 345 }}>
-            <CardMedia
-              component="img"
-              alt={product.name}
-              height="140"
-              image={product.image}
-            />
-            <CardContent>
-              <Typography gutterBottom variant="h6" component="div">
-                {product.productName}
-              </Typography>
-              <Typography variant="subtitle1" color="text.secondary">
-                ${product.price ?product.price.toFixed(2):0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Stock: {product.quantity}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                onClick={() => addToCart({
-                  id:product.id,
-                      name:product.name,
-                      price:product.price,
-                      quantity:product.quantity
-                })}
-                disabled={product.stock === 0}
-              >
-                Add to Cart
-              </Button>
-            </CardActions>
-          </Card>
+        <Grid item xs={12} sm={6} md={6}>
+          <ProductForm
+            open={isDrawerOpen}
+            onClose={() => toggleDrawer(false)}
+            anchor="right"
+            onProductAdded={addProductAndUpdate}
+          />
         </Grid>
-      ))}
-    </Grid>
-    </div>
+      </Stack>
+      <div style={{ overflowX: "auto" }}>
+        <Grid container spacing={3}>
+          {filteredProducts.map((product) => (
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  alt={product.name}
+                  height="140"
+                  image={product.image}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div">
+                    {product.productName}
+                  </Typography>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    ${product.price ? product.price.toFixed(2) : 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Stock: {product.quantity}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    // onClick={() => addToCart({
+                    //   id:product.id,
+                    //       name:product.name,
+                    //       price:product.price,
+                    //       quantity:product.quantity
+                    // })}
+                    disabled={product.stock === 0}
+                  >
+                    Add to Cart
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
     </>
   );
 }

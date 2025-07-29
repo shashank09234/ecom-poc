@@ -5,9 +5,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 // import useProduct from "./useProduct";
 
-export default function AddProduct({addProduct}) {
+export default function AddProduct({ addProduct }) {
   // useProduct hook provides the product list and addProduct function
-//   const { product, addProduct } = useProduct();
+  //   const { product, addProduct } = useProduct();
 
   // Local form state separate from the product list
   const [formState, setFormState] = useState({
@@ -23,7 +23,11 @@ export default function AddProduct({addProduct}) {
   const validate = () => {
     const errs = {};
     if (!formState.name.trim()) errs.name = "Product name is required";
-    if (!formState.price || isNaN(formState.price) || Number(formState.price) <= 0)
+    if (
+      !formState.price ||
+      isNaN(formState.price) ||
+      Number(formState.price) <= 0
+    )
       errs.price = "Valid price is required";
     if (
       formState.quantity === "" ||
@@ -53,7 +57,7 @@ export default function AddProduct({addProduct}) {
       quantity: Number(formState.quantity),
       image: formState.image.trim(),
     };
-    console.log(newProduct)
+    console.log(newProduct);
     addProduct(newProduct);
 
     // Reset the form after adding the product

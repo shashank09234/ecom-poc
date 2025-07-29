@@ -1,29 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
-import Sidebar from './Navbar/SideBar/SideBar';
-import TopBar from './TopBar/TopBar';
-import { createContext, useEffect,useMemo,useRef,useState } from 'react';
-import MainComponent from './MainComponent/MainComponent';
-import useCart from './MainComponent/ProductCards/useCart';
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './AppRoutes';
+import logo from "./logo.svg";
+import "./App.css";
+import Sidebar from "./Navbar/SideBar/SideBar";
+import TopBar from "./TopBar/TopBar";
+import { createContext, useEffect, useMemo, useRef, useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./AppRoutes";
 
 function App() {
-  // const sidebarRef = useRef([]);
   const [sidebarWidth, setSidebarWidth] = useState(0);
-  const { cart, addProduct } = useCart([]);
-  const [selectedMenu, setSelectedMenu] = useState("Category");
   return (
     <BrowserRouter>
-      
-      <Sidebar  setValue = {setSidebarWidth} selectedMenu = {setSelectedMenu} />
-      <TopBar topBarWidth={sidebarWidth} cart={cart}/>
-      <MainComponent topBarWidth = {sidebarWidth} 
-      addProduct={addProduct}
-      menu={selectedMenu}
-      />
-      <AppRoutes />
-      </BrowserRouter>
+      <Sidebar setValue={setSidebarWidth} />
+      <TopBar topBarWidth={sidebarWidth} />
+
+      <main
+        style={{
+          marginLeft: sidebarWidth,
+          marginTop: "64px", // height of TopBar
+          padding: 24,
+          width: `calc(100% - ${sidebarWidth}px)`,
+          height: `calc(100vh - 64px)`,
+          boxSizing: "border-box",
+          overflowY: "auto",
+          backgroundColor: "#f9fafb",
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
+        <AppRoutes topBarWidth={sidebarWidth} />
+      </main>
+    </BrowserRouter>
   );
 }
 

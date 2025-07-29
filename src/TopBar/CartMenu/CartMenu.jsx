@@ -3,12 +3,9 @@ import React, { useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 
-export default function CartMenu({ products }) {
+export default function CartMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpen = (event) => {
@@ -31,7 +28,7 @@ export default function CartMenu({ products }) {
         onClick={handleOpen}
         color="inherit"
       >
-        <Badge badgeContent={products.length} color="error">
+        <Badge badgeContent="2" color="error">
           <ShoppingCartIcon />
         </Badge>
       </IconButton>
@@ -49,27 +46,8 @@ export default function CartMenu({ products }) {
           vertical: "top",
           horizontal: "right",
         }}
-        PaperProps={{ style: { maxHeight: 300, width: '300px' } }}
-      >
-        {products.length === 0 && (
-          <MenuItem disabled>
-            <Typography variant="body2">No products added</Typography>
-          </MenuItem>
-        )}
-
-        {products.map((product, index) => (
-          <MenuItem key={index} onClick={handleClose} sx={{ whiteSpace: 'normal' }}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {product.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Qty: {product.quantity} | Price: ${product.price.toFixed(2)}
-              </Typography>
-            </Box>
-          </MenuItem>
-        ))}
-      </Menu>
+        PaperProps={{ style: { maxHeight: 300, width: "300px" } }}
+      ></Menu>
     </>
   );
 }
