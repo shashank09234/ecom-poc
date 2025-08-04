@@ -10,6 +10,8 @@ import { alpha, styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import ProfileMenu from "./ProfileMenu/ProfileMenu";
 import CartMenu from "./CartMenu/CartMenu";
+
+
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,

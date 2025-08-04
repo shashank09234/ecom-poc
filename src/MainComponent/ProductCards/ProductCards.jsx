@@ -10,6 +10,9 @@ import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Stack, TextField } from "@mui/material";
 import ProductForm from "./ProductForm";
+import Login from "../../AuthComponent/LogIn";
+import { toast } from "react-toastify";
+import { useCart } from "../../CartProvider"; 
 
 const formatDateString = (dateString) => {
   const date = new Date(dateString);
@@ -22,7 +25,8 @@ export default function ProductCards() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-
+  const [isLoginOpen, setLoginOpen] = useState(false);
+  const {addToCart, getCart} = useCart();
   const fetchData = useCallback(() => {
     axios
       .get("http://localhost:8080/inventry/product")
@@ -83,6 +87,68 @@ export default function ProductCards() {
       await fetchData(); // Fetch updated category list
     } catch (error) {
       console.error("Error updating Product list:", error);
+    }
+  };
+  const showToast = (msg) => {
+      toast.success(msg, {
+        position: "top-right",
+        autoClose: 3000, // 3 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    };
+const addToCartHandle = async(id)=>{
+  
+    console.log("Product Id:", id);
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user,"user")
+    if(user){
+      addToCart({
+        userId:user.id,
+        productId:id
+      });
+      getCart(user.id);
+    }else{
+      setLoginOpen(true);
+    }
+    // TODO: Implement actual signup API call here
+    // After successful signup, you might want to login the user automatically:
+    
+}
+  const handleLogin = async (data) => {
+    console.log("SigLoginnup data submitted:", data);
+    // TODO: Implement actual signup API call here
+    // After successful signup, you might want to login the user automatically:
+    try {
+      console.log(data);
+      const response = await axios.post(
+        "http://localhost:8080/auth/login",
+        data
+      );
+      console.log(response);
+      if (response.status === 200) {
+        localStorage.setItem("user",JSON.stringify({
+          id: response.data.id,
+          userName: response.data.userName,
+          firstName: response.data.firstName
+        }));
+        // login({
+        //   name: data.firstName,
+        //   email: data.emailId,
+        //   userName: data.userName,
+        // });
+        showToast("Logged In Success");
+      } else {
+        showToast("Logged In Failed");
+      }
+      return response;
+    } catch (error) {
+      showToast("Error adding Product");
+      console.error(error);
+      throw error; // allow caller to know of failure
     }
   };
 
@@ -152,12 +218,7 @@ export default function ProductCards() {
                     size="small"
                     variant="contained"
                     color="primary"
-                    // onClick={() => addToCart({
-                    //   id:product.id,
-                    //       name:product.name,
-                    //       price:product.price,
-                    //       quantity:product.quantity
-                    // })}
+                    onClick={() => addToCartHandle(product.id)}
                     disabled={product.stock === 0}
                   >
                     Add to Cart
@@ -168,6 +229,11 @@ export default function ProductCards() {
           ))}
         </Grid>
       </div>
+      <Login
+              open={isLoginOpen}
+              onClose={() => setLoginOpen(false)}
+              onLogin={handleLogin}
+            />
     </>
   );
 }

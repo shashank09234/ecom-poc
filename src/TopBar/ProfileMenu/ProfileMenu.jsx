@@ -63,7 +63,11 @@ export default function ProfileMenu() {
       );
       console.log(response);
       if (response.status === 201) {
-        localStorage.setItem("user",data)
+        localStorage.setItem("user",JSON.stringify({
+          id: response.data.id,
+          userName: response.data.userName,
+          firstName: response.data.firstName
+        }))
         // login({
         //   name: data.firstName,
         //   email: data.emailId,
@@ -91,9 +95,13 @@ export default function ProfileMenu() {
         "http://localhost:8080/auth/login",
         data
       );
-      console.log(response);
+      console.log(response.data);
       if (response.status === 200) {
-        localStorage.setItem("user",data);
+        localStorage.setItem("user",JSON.stringify({
+          id: response.data.id,
+          userName: response.data.userName,
+          firstName: response.data.firstName
+        }));
         // login({
         //   name: data.firstName,
         //   email: data.emailId,
