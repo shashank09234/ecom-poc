@@ -106,11 +106,11 @@ const addToCartHandle = async(id)=>{
     const user = JSON.parse(localStorage.getItem("user"));
     console.log(user,"user")
     if(user){
-      addToCart({
+      await addToCart({
         userId:user.id,
         productId:id
       });
-      getCart(user.id);
+      await getCart(user.id);
     }else{
       setLoginOpen(true);
     }
@@ -140,6 +140,16 @@ const addToCartHandle = async(id)=>{
         //   email: data.emailId,
         //   userName: data.userName,
         // });
+        if (response.status === 200) {
+  const userData = {
+    id: response.data.id,
+    userName: response.data.userName,
+    firstName: response.data.firstName
+  };
+  localStorage.setItem("user", JSON.stringify(userData));
+  showToast("Logged In Success");
+  getCart(userData.id); // <-- Fetch cart
+}
         showToast("Logged In Success");
       } else {
         showToast("Logged In Failed");

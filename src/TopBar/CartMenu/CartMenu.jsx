@@ -1,4 +1,3 @@
-// src/CartMenu.js
 import React, { useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
@@ -10,15 +9,17 @@ import { Box, Typography } from "@mui/material";
 
 export default function CartMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const {cart} = useCart([]);
+  const { cart, getCart } = useCart();
 
-  useEffect(()=>{
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    // getCart(user.id);
-  },[cart])
+    if (user?.id) {
+      getCart(user.id);
+    }
+  }, []); // 👈 No infinite loop
+
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    
   };
 
   const handleClose = () => {
@@ -42,8 +43,7 @@ export default function CartMenu() {
         </Badge>
       </IconButton>
 
-
-       <Menu
+      <Menu
         id="cart-menu"
         anchorEl={anchorEl}
         open={open}
@@ -56,26 +56,26 @@ export default function CartMenu() {
           vertical: "top",
           horizontal: "right",
         }}
-        PaperProps={{ style: { maxHeight: 300, width: '300px' } }}
+        PaperProps={{ style: { maxHeight: 300, width: "300px" } }}
       >
-        {cart.length === 0 && (
+        {cart.length === 0 ? (
           <MenuItem disabled>
             <Typography variant="body2">No products added</Typography>
           </MenuItem>
-        )}
-
-        {cart.map((product, index) => (
-          <MenuItem key={index} onClick={handleClose} sx={{ whiteSpace: 'normal' }}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {product.productName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Qty: {product.qty} | Price: ${product.productPrice.toFixed(2)}
+        ) : (
+          cart.map((product, index) => (
+            <MenuItem key={index} onClick={handleClose} sx={{ whiteSpace: "normal" }}>
+              <Box>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {product.productName}
                 </Typography>
-            </Box>
-          </MenuItem>
-           ))}
+                <Typography variant="body2" color="text.secondary">
+                  Qty: {product.qty} | Price: ${product.productPrice.toFixed(2)}
+                </Typography>
+              </Box>
+            </MenuItem>
+          ))
+        )}
       </Menu>
     </>
   );

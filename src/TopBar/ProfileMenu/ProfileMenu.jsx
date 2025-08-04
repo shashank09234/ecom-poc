@@ -9,12 +9,14 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Login from "../../AuthComponent/LogIn";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../CartProvider";
 
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
   const navigate = useNavigate();
+  const {cart,getCart} = useCart();
   // const { isLoggedIn, login, logout } = useAuth();
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
@@ -26,6 +28,7 @@ export default function ProfileMenu() {
     switch (option) {
       case "Login":
         setLoginOpen(true);
+
         break;
       case "Logout":
         localStorage.removeItem("user")
@@ -68,6 +71,7 @@ export default function ProfileMenu() {
           userName: response.data.userName,
           firstName: response.data.firstName
         }))
+        await getCart(response.data.id)
         // login({
         //   name: data.firstName,
         //   email: data.emailId,
@@ -102,6 +106,7 @@ export default function ProfileMenu() {
           userName: response.data.userName,
           firstName: response.data.firstName
         }));
+        await getCart(response.data.id)
         // login({
         //   name: data.firstName,
         //   email: data.emailId,
