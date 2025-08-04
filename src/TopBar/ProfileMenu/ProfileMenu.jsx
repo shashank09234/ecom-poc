@@ -3,17 +3,19 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useAuth } from "../../AuthProvider";
+// import { useAuth } from "../../AuthProvider";
 import SignupDialog from "../../AuthComponent/SignupDialog";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Login from "../../AuthComponent/LogIn";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
-  const { isLoggedIn, login, logout } = useAuth();
+  const navigate = useNavigate();
+  // const { isLoggedIn, login, logout } = useAuth();
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -26,7 +28,9 @@ export default function ProfileMenu() {
         setLoginOpen(true);
         break;
       case "Logout":
-        logout();
+        localStorage.removeItem("user")
+        navigate('/');
+        // logout();
         break;
       case "Signup":
         setSignupOpen(true);
@@ -59,11 +63,12 @@ export default function ProfileMenu() {
       );
       console.log(response);
       if (response.status === 201) {
-        login({
-          name: data.firstName,
-          email: data.emailId,
-          userName: data.userName,
-        });
+        localStorage.setItem("user",data)
+        // login({
+        //   name: data.firstName,
+        //   email: data.emailId,
+        //   userName: data.userName,
+        // });
         showToast("Account Created");
       } else {
         showToast("Account Creation Failed");
@@ -88,11 +93,12 @@ export default function ProfileMenu() {
       );
       console.log(response);
       if (response.status === 200) {
-        login({
-          name: data.firstName,
-          email: data.emailId,
-          userName: data.userName,
-        });
+        localStorage.setItem("user",data);
+        // login({
+        //   name: data.firstName,
+        //   email: data.emailId,
+        //   userName: data.userName,
+        // });
         showToast("Logged In Success");
       } else {
         showToast("Logged In Failed");
@@ -126,28 +132,28 @@ export default function ProfileMenu() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        {isLoggedIn && (
+        {localStorage.getItem("user") && (
           <MenuItem onClick={() => handleMenuItemClick("View Profile")}>
             View Profile
           </MenuItem>
         )}
-        {isLoggedIn && (
+        {localStorage.getItem("user") && (
           <MenuItem onClick={() => handleMenuItemClick("My Orders")}>
             My Orders
           </MenuItem>
         )}
-        {isLoggedIn && (
+        {localStorage.getItem("user") && (
           <MenuItem onClick={() => handleMenuItemClick("Logout")}>
             Logout
           </MenuItem>
         )}
 
-        {!isLoggedIn && (
+        {!localStorage.getItem("user") && (
           <MenuItem onClick={() => handleMenuItemClick("Login")}>
             Login
           </MenuItem>
         )}
-        {!isLoggedIn && (
+        {!localStorage.getItem("user") && (
           <MenuItem onClick={() => handleMenuItemClick("Signup")}>
             Signup
           </MenuItem>

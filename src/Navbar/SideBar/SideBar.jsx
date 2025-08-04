@@ -15,44 +15,47 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import CategoryIcon from "@mui/icons-material/Category";
 
 import { styled } from "@mui/material/styles";
-import { useAuth } from "../../AuthProvider";
+// import { useAuth } from "../../AuthProvider";
 import { Link } from "react-router-dom";
 
 export const drawerWidthClosed = 60; // Fixed width when closed
 
 export default function Sidebar({ setValue }) {
   const [open, setOpen] = useState(true);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(2);
   const drawerWidthOpen = useRef(240); // default fallback
-  const isLoggedIn = useAuth();
+  // const isLoggedIn = useAuth();
   const itemTextRefs = useRef([]);
 
   const allMenuItems = [
     {
+      id:1,
       text: "Category",
       icon: <CategoryIcon sx={{ color: "white" }} />,
       route: "/categories",
     },
     {
+      id:2,
       text: "Products",
       icon: <InventoryIcon sx={{ color: "white" }} />,
       route: "/products",
     },
     {
+      id:3,
       text: "Orders",
       icon: <SettingsIcon sx={{ color: "white" }} />,
       route: "/orders",
     },
   ];
-  console.log(isLoggedIn.isLoggedIn, "login");
+  console.log(localStorage.getItem("user"), "login");
   const menuItems = useMemo(() => {
-    console.log(isLoggedIn.isLoggedIn, "menuItems");
-    return isLoggedIn.isLoggedIn
+    console.log(localStorage.getItem("user"), "menuItems");
+    return localStorage.getItem("user")
       ? allMenuItems
       : allMenuItems.filter(
           (item) => !(item.text === "Category" || item.text === "Add Product")
         );
-  }, [isLoggedIn]);
+  }, [localStorage.getItem("user")]);
   const toggleDrawer = () => {
     setOpen((prev) => !prev);
   };
@@ -128,7 +131,7 @@ export default function Sidebar({ setValue }) {
       >
         {/* Adjust height based on height of toggle button + divider */}
         <List>
-          {menuItems.map(({ text, icon, route }, index) => (
+          {menuItems.map(({ id,text, icon, route }, index) => (
             <Tooltip
               key={text}
               title={!open ? text : ""}
@@ -136,8 +139,8 @@ export default function Sidebar({ setValue }) {
               arrow
             >
               <ListItemButton
-                selected={selectedIndex === index}
-                onClick={() => handleListItemClick(index)}
+                selected={selectedIndex === id}
+                onClick={() => handleListItemClick(id)}
                 component={Link}
                 to={route}
                 sx={{

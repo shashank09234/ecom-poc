@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 
 import { ToastContainer } from "react-toastify";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Paper,
+  Typography,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -27,9 +34,11 @@ const Form = styled("form")({
 });
 
 export default function ProductForm({ onProductAdded }) {
+  const [categoryList, setCategoryList] = useState([]);
   const [state, setState] = useState({
     right: false,
   });
+  const [file, setFile] = useState(null);
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -38,6 +47,8 @@ export default function ProductForm({ onProductAdded }) {
     ) {
       return;
     }
+    if(open)
+      fetchData()
     if (!open) onProductAdded();
     setState({ ...state, [anchor]: open });
   };
@@ -57,6 +68,7 @@ export default function ProductForm({ onProductAdded }) {
   const today = new Date();
   const [selectedDate, setSelectedDate] = React.useState(dayjs(today));
   // Set initial state for the DatePicker
+   
   const [formData, setFormData] = useState({
     productCode: "",
     productName: "",
@@ -67,16 +79,23 @@ export default function ProductForm({ onProductAdded }) {
     category: "",
     imagePath: "",
     description: "",
-    date: selectedDate.format("YYYY-MM-DD HH:mm:ss"),
+    // date: selectedDate.format("YYYY-MM-DD HH:mm:ss"),
   });
 
+ 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     console.log("form submitted");
     console.log(formData);
-
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+    
+    if (file) data.append("image", file); // "image" should match backend param
     // Await the API call before closing drawer
-    await addProduct(formData);
+    for (let pair of data.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
+    await addProduct(data);
 
     // Close drawer after successful adding
     toggleDrawer("right", false)(event); // pass event for safety, or just toggleDrawer('right', false)()
@@ -86,7 +105,12 @@ export default function ProductForm({ onProductAdded }) {
     try {
       const response = await axios.post(
         "http://localhost:8080/inventry/product",
-        product
+        product,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       console.log(response);
       if (response.status === 201) {
@@ -102,6 +126,23 @@ export default function ProductForm({ onProductAdded }) {
     }
   };
 
+  const fetchData = useCallback(() => {
+      axios
+        .get("http://localhost:8080/inventry/category")
+        .then((response) => {
+          if (response.status !== 200) {
+            throw new Error("Network response was not ok");
+          }
+          return response.data;
+        })
+        .then((data)=>{
+          console.log(data)
+          setCategoryList(data)
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }, []);
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -109,7 +150,10 @@ export default function ProductForm({ onProductAdded }) {
       [name]: value,
     }));
   };
-
+  // Add handler for file input
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
   const list = () => (
     <FormContainer>
       <Typography
@@ -119,7 +163,7 @@ export default function ProductForm({ onProductAdded }) {
         fontWeight="bold"
         style={{ color: "blue" }}
       >
-        Add New Category
+        Add New Product
       </Typography>
       <Form onSubmit={handleFormSubmit}>
         <TextField
@@ -146,18 +190,63 @@ export default function ProductForm({ onProductAdded }) {
           variant="outlined"
           onChange={handleInputChange}
         />
-        <TextField
-          name="qtyType"
-          label="Product Price"
+        <Select
+          name="categoryId"
+          value={formData.categoryId}
+          // onChange={handleInputChange}
+          displayEmpty
           variant="outlined"
+          onChange={(event) => {
+    const selectedId = event.target.value;
+    const selectedCategory = categoryList.find(
+      (cat) => cat.id === selectedId
+    );
+    setFormData((prev) => ({
+      ...prev,
+      categoryId: selectedId,
+      category: selectedCategory ? selectedCategory.categoryName : "",
+    }));
+  }}
+        >
+          <MenuItem value="" disabled>
+            Select Category
+          </MenuItem>
+          {
+            categoryList.map(category=>{
+              return (
+                <MenuItem  key={category.id} value={category.id}>{category.categoryName}</MenuItem>
+              )
+            })
+          }
+          
+        </Select>
+        <Select
+          name="qtyType"
+          value={formData.qtyType}
           onChange={handleInputChange}
-        />
+          displayEmpty
+          variant="outlined"
+        >
+          <MenuItem value="" disabled>
+            Select Quantity Type
+          </MenuItem>
+          <MenuItem value="ITEM">Item</MenuItem>
+          <MenuItem value="WEIGHT">Weight</MenuItem>
+        </Select>
         <TextField
           name="description"
           label="Description"
           variant="outlined"
           onChange={handleInputChange}
         />
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ marginTop: "8px" }}
+        />
+
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DemoContainer components={["MobileDateTimePicker"]}>
             <MobileDateTimePicker
@@ -178,7 +267,7 @@ export default function ProductForm({ onProductAdded }) {
 
   return (
     <div>
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         <Button variant="contained" onClick={toggleDrawer("right", true)}>
           Add Category
         </Button>

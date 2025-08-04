@@ -101,7 +101,7 @@ export default function ProductCards() {
           onChange={handleSearch}
         />
 
-        <Grid item xs={12} sm={6} md={6}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <ProductForm
             open={isDrawerOpen}
             onClose={() => toggleDrawer(false)}
@@ -113,15 +113,30 @@ export default function ProductCards() {
       <div style={{ overflowX: "auto" }}>
         <Grid container spacing={3}>
           {filteredProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.id}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.id}>
+              <Card
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <CardMedia
                   component="img"
                   alt={product.name}
-                  height="140"
-                  image={product.image}
+                  image={
+                    product.imagePath &&
+                    `http://localhost:8080/inventry/productImage?imagePath=${product.imagePath}`
+                  }
+                  sx={{
+                  height:"100%",
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    backgroundColor: "#f5f5f5",
+                  }}
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h6" component="div">
                     {product.productName}
                   </Typography>
@@ -129,7 +144,7 @@ export default function ProductCards() {
                     ${product.price ? product.price.toFixed(2) : 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Stock: {product.quantity}
+                    Stock: {product.qty}
                   </Typography>
                 </CardContent>
                 <CardActions>
